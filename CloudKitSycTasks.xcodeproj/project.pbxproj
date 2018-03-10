@@ -13,6 +13,8 @@
 		8547AA512054337E00E79117 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8547AA502054337E00E79117 /* Assets.xcassets */; };
 		8547AA542054337E00E79117 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8547AA522054337E00E79117 /* LaunchScreen.storyboard */; };
 		8547AA5C2054345C00E79117 /* TaskListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8547AA5B2054345C00E79117 /* TaskListTableViewController.swift */; };
+		8547AA5E2054392800E79117 /* EditTaskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8547AA5D2054392800E79117 /* EditTaskViewController.swift */; };
+		8547AA6020543B9200E79117 /* TaskModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8547AA5F20543B9200E79117 /* TaskModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,8 @@
 		8547AA532054337E00E79117 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8547AA552054337E00E79117 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8547AA5B2054345C00E79117 /* TaskListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskListTableViewController.swift; sourceTree = "<group>"; };
+		8547AA5D2054392800E79117 /* EditTaskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTaskViewController.swift; sourceTree = "<group>"; };
+		8547AA5F20543B9200E79117 /* TaskModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,11 +62,13 @@
 			children = (
 				8547AA462054337E00E79117 /* AppDelegate.swift */,
 				8547AA4A2054337E00E79117 /* Main.storyboard */,
+				8547AA5D2054392800E79117 /* EditTaskViewController.swift */,
 				8547AA502054337E00E79117 /* Assets.xcassets */,
 				8547AA522054337E00E79117 /* LaunchScreen.storyboard */,
 				8547AA552054337E00E79117 /* Info.plist */,
 				8547AA4D2054337E00E79117 /* CloudKitSycTasks.xcdatamodeld */,
 				8547AA5B2054345C00E79117 /* TaskListTableViewController.swift */,
+				8547AA5F20543B9200E79117 /* TaskModel.swift */,
 			);
 			path = CloudKitSycTasks;
 			sourceTree = "<group>";
@@ -141,7 +147,9 @@
 			files = (
 				8547AA5C2054345C00E79117 /* TaskListTableViewController.swift in Sources */,
 				8547AA4F2054337E00E79117 /* CloudKitSycTasks.xcdatamodeld in Sources */,
+				8547AA6020543B9200E79117 /* TaskModel.swift in Sources */,
 				8547AA472054337E00E79117 /* AppDelegate.swift in Sources */,
+				8547AA5E2054392800E79117 /* EditTaskViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
