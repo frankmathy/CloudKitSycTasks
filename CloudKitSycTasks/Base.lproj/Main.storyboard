@@ -52,7 +52,7 @@
                             <outlet property="delegate" destination="SNC-4S-Vv4" id="cQ1-Ep-iDA"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="RXu-4L-UR8">
+                    <navigationItem key="navigationItem" title="Tasks" id="RXu-4L-UR8">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="9rK-8P-pur">
                             <connections>
                                 <segue destination="G7S-dj-NEc" kind="show" identifier="Add" id="4xO-0N-y8v"/>
@@ -118,7 +118,7 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="ALK-TD-hec"/>
                     </view>
-                    <navigationItem key="navigationItem" id="j9u-YB-gS8">
+                    <navigationItem key="navigationItem" title="Edit Task" id="j9u-YB-gS8">
                         <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="En0-y8-UaW">
                             <connections>
                                 <segue destination="iZo-Rc-cBS" kind="unwind" unwindAction="cancelEditTaskViewController:" id="nbz-SJ-eCg"/>
