@@ -50,27 +50,6 @@ class LocalSettings {
         }
     }
     
-    var changeToken : CKServerChangeToken? {
-        get {
-            guard let data = defaults.value(forKey: keyChangeToken) as? Data else {
-                return nil
-            }
-            guard let token = NSKeyedUnarchiver.unarchiveObject(with: data) as? CKServerChangeToken else {
-                return nil
-            }
-            return token
-        }
-        
-        set (newValue) {
-            if let token = newValue {
-                let data = NSKeyedArchiver.archivedData(withRootObject: token)
-                defaults.set(data, forKey: keyChangeToken)
-            } else {
-                defaults.removeObject(forKey: keyChangeToken)
-            }
-        }
-    }
-
     func getChangeToken(forKey: String) -> CKServerChangeToken? {
         guard let data = defaults.value(forKey: forKey) as? Data else {
             return nil

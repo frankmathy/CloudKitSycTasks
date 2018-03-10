@@ -12,7 +12,7 @@ import CoreData
 
 class TaskModel {
     var tasks = [Task]()
-    let cloudKitModel : CloudKitModel? = nil
+    var cloudKitModel : CloudKitModel?
     
     private func getContext() -> NSManagedObjectContext? {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return nil }

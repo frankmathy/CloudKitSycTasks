@@ -18,6 +18,7 @@ class TaskListTableViewController: UITableViewController {
         self.navigationItem.leftBarButtonItem = self.editButtonItem
         model.reload()
         self.tableView.reloadData()
+        model.cloudKitModel = CloudKitModel(taskModel: model)
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {

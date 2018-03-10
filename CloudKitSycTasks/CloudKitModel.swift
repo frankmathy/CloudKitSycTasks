@@ -75,7 +75,8 @@ class CloudKitModel {
         // Fetch any changes from the server that happened while the app wasn't running
         createZoneGroup.notify(queue: DispatchQueue.global()) {
             if settings.createdCustomZone {
-                // TODO self.fet
+                self.fetchChanges(in: .private, completion: { })
+                self.fetchChanges(in: .shared, completion: { })
             }
         }
     }
@@ -105,14 +106,16 @@ class CloudKitModel {
     func fetchDatabaseChanges(database: CKDatabase, databaseTokenKey: String, completion: @escaping () -> Void) {
         var changedZoneIDs: [CKRecordZoneID] = []
         
-        let changeToken = LocalSettings.sharedInstance.changeToken
+        let changeToken = LocalSettings.sharedInstance.getChangeToken(forKey: databaseTokenKey)
         let operation = CKFetchDatabaseChangesOperation(previousServerChangeToken: changeToken)
         
         operation.recordZoneWithIDChangedBlock = { (zoneID) in
+            // The block that processes a single record zone change.
             changedZoneIDs.append(zoneID)
         }
         
         operation.recordZoneWithIDWasDeletedBlock = { (zoneID) in
+            // The block that processes a single record zone deletion.
             // TODO Write this zone deletion to memory
         }
         
@@ -122,6 +125,7 @@ class CloudKitModel {
         }
         
         operation.fetchDatabaseChangesCompletionBlock = { (token, moreComing, error) in
+            // The block to execute when the operation completes.
             if let error = error {
                 print("Error during fetch shared database changes operation", error)
                 completion()
