@@ -8,22 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		8547AA472054337E00E79117 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8547AA462054337E00E79117 /* AppDelegate.swift */; };
-		8547AA492054337E00E79117 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8547AA482054337E00E79117 /* ViewController.swift */; };
 		8547AA4C2054337E00E79117 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8547AA4A2054337E00E79117 /* Main.storyboard */; };
 		8547AA4F2054337E00E79117 /* CloudKitSycTasks.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8547AA4D2054337E00E79117 /* CloudKitSycTasks.xcdatamodeld */; };
 		8547AA512054337E00E79117 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8547AA502054337E00E79117 /* Assets.xcassets */; };
 		8547AA542054337E00E79117 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8547AA522054337E00E79117 /* LaunchScreen.storyboard */; };
+		8547AA5C2054345C00E79117 /* TaskListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8547AA5B2054345C00E79117 /* TaskListTableViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		8547AA432054337E00E79117 /* CloudKitSycTasks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CloudKitSycTasks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8547AA462054337E00E79117 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		8547AA482054337E00E79117 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		8547AA4B2054337E00E79117 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		8547AA4E2054337E00E79117 /* CloudKitSycTasks.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CloudKitSycTasks.xcdatamodel; sourceTree = "<group>"; };
 		8547AA502054337E00E79117 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8547AA532054337E00E79117 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8547AA552054337E00E79117 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8547AA5B2054345C00E79117 /* TaskListTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskListTableViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,12 +57,12 @@
 			isa = PBXGroup;
 			children = (
 				8547AA462054337E00E79117 /* AppDelegate.swift */,
-				8547AA482054337E00E79117 /* ViewController.swift */,
 				8547AA4A2054337E00E79117 /* Main.storyboard */,
 				8547AA502054337E00E79117 /* Assets.xcassets */,
 				8547AA522054337E00E79117 /* LaunchScreen.storyboard */,
 				8547AA552054337E00E79117 /* Info.plist */,
 				8547AA4D2054337E00E79117 /* CloudKitSycTasks.xcdatamodeld */,
+				8547AA5B2054345C00E79117 /* TaskListTableViewController.swift */,
 			);
 			path = CloudKitSycTasks;
 			sourceTree = "<group>";
@@ -139,8 +139,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8547AA5C2054345C00E79117 /* TaskListTableViewController.swift in Sources */,
 				8547AA4F2054337E00E79117 /* CloudKitSycTasks.xcdatamodeld in Sources */,
-				8547AA492054337E00E79117 /* ViewController.swift in Sources */,
 				8547AA472054337E00E79117 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -285,7 +285,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = de.frankmathy.CloudKitSycTasks;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -300,7 +300,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = de.frankmathy.CloudKitSycTasks;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
