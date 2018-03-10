@@ -12,6 +12,7 @@ import CoreData
 
 class TaskModel {
     var tasks = [Task]()
+    let cloudKitModel : CloudKitModel? = nil
     
     private func getContext() -> NSManagedObjectContext? {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return nil }
@@ -53,4 +54,6 @@ class TaskModel {
         context.delete(task)
         saveChanges()
     }
+    
+    
 }
