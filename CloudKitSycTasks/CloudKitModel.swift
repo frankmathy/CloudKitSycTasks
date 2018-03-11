@@ -190,6 +190,7 @@ class CloudKitModel {
         
         operation.recordZoneChangeTokensUpdatedBlock = { (zoneId, token, data) in
             // The block to execute when the change token has been updated.
+            print("Zone Change token updated:", token)
             settings.setChangeToken(forKey: databaseTokenKey, newValue: token)
         }
         
