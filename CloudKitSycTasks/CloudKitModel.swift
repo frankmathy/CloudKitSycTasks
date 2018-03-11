@@ -190,12 +190,12 @@ class CloudKitModel {
         
         operation.recordZoneChangeTokensUpdatedBlock = { (zoneId, token, data) in
             // The block to execute when the change token has been updated.
-            print("Zone Change token updated:", token)
-            settings.setChangeToken(forKey: databaseTokenKey, newValue: token)
         }
         
         operation.recordZoneFetchCompletionBlock = { (zoneId, changeToken, _, _, error) in
             // The block to execute when the fetch for a zone has completed.
+            print("Zone Change token updated2:", changeToken)
+            settings.setChangeToken(forKey: databaseTokenKey, newValue: changeToken)
         }
         
         operation.fetchRecordZoneChangesCompletionBlock = { (error) in

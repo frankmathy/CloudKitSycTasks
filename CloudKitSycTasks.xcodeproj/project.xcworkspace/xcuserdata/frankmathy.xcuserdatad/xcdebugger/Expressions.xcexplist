@@ -3,10 +3,13 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "closure #1 in CloudKitModel.fetchZoneChanges(database:databaseTokenKey:zoneIDs:completion:):CloudKitModel.swift">
+         contextName = "CloudKitModel.init(taskModel:):CloudKitModel.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #3 in CloudKitModel.fetchDatabaseChanges(database:databaseTokenKey:completion:):CloudKitModel.swift">
          <PersistentStrings>
             <PersistentString
-               value = "record.recordType">
+               value = "token.debugDescription">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -22,7 +25,12 @@
          contextName = "CloudKitModel.fetchZoneChanges(database:databaseTokenKey:zoneIDs:completion:):CloudKitModel.swift">
       </ContextState>
       <ContextState
-         contextName = "CloudKitModel.init(taskModel:):CloudKitModel.swift">
+         contextName = "closure #1 in CloudKitModel.fetchZoneChanges(database:databaseTokenKey:zoneIDs:completion:):CloudKitModel.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "record.recordType">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
    </ContextStates>
 </VariablesViewState>
