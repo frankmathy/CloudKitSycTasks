@@ -76,9 +76,11 @@ class TaskListTableViewController: UITableViewController {
     }
     
     @IBAction func saveEditTaskViewController(_ segue: UIStoryboardSegue) {
-        model.saveChanges()
-        model.reload()
-        self.tableView.reloadData()
+        if let editTaskViewController = segue.source as? EditTaskViewController, let task = editTaskViewController.task {
+            model.save(task: task)
+            model.reload()
+            self.tableView.reloadData()
+        }
     }
 
     @IBAction func cancelEditTaskViewController(_ segue: UIStoryboardSegue) {

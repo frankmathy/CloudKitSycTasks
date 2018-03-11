@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "closure #1 in CloudKitModel.fetchZoneChanges(database:databaseTokenKey:zoneIDs:completion:):CloudKitModel.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "record.recordType">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "CloudKitModel.save(task:):CloudKitModel.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "record.recordID.recordName">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "CloudKitModel.fetchZoneChanges(database:databaseTokenKey:zoneIDs:completion:):CloudKitModel.swift">
+      </ContextState>
+      <ContextState
+         contextName = "CloudKitModel.init(taskModel:):CloudKitModel.swift">
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>

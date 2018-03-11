@@ -12,9 +12,12 @@ import CloudKit
 
 class CloudKitModel {
 
+    let recordName = "Task"
     let privateSubscriptionId = "private-changes"
     let sharedSubscriptionId = "shared-changes"
     
+    let zoneID = CKRecordZoneID(zoneName: "Todos", ownerName: CKCurrentUserDefaultName)
+
     var privateDB : CKDatabase
     var sharedDB : CKDatabase
     
@@ -26,7 +29,6 @@ class CloudKitModel {
         let container = CKContainer.default()
         privateDB = container.privateCloudDatabase
         sharedDB = container.sharedCloudDatabase
-        let zoneID = CKRecordZoneID(zoneName: "Todos", ownerName: CKCurrentUserDefaultName)
 
         let createZoneGroup = DispatchGroup()
         let settings = LocalSettings.sharedInstance
@@ -76,7 +78,27 @@ class CloudKitModel {
         createZoneGroup.notify(queue: DispatchQueue.global()) {
             if settings.createdCustomZone {
                 self.fetchChanges(in: .private, completion: { })
-                self.fetchChanges(in: .shared, completion: { })
+                // TODO self.fetchChanges(in: .shared, completion: { })
+            }
+        }
+    }
+    
+    func save(task : Task) {
+        var record : CKRecord
+        if task.cloudKitRecordName != nil {
+            let recordId = CKRecordID(recordName: task.cloudKitRecordName!, zoneID: zoneID)
+            record = CKRecord(recordType: recordName, recordID: recordId)
+        } else {
+            record = CKRecord(recordType: recordName, zoneID: zoneID)
+            task.cloudKitRecordName = record.recordID.recordName
+            taskModel?.saveChanges()
+        }
+        record["taskName"] = task.taskName as CKRecordValue?
+        record["done"] = task.done as CKRecordValue
+        privateDB.save(record) { (record, error) in
+            guard error == nil else {
+                print("Error saving task to CloudKit with id)\(record!.recordID)")
+                return
             }
         }
     }
@@ -120,8 +142,8 @@ class CloudKitModel {
         }
         
         operation.changeTokenUpdatedBlock = { (token) in
-            // Flush zone deletions for this database to disk
             // Write this new database change token to memory
+            print("Token Updated")
         }
         
         operation.fetchDatabaseChangesCompletionBlock = { (token, moreComing, error) in
@@ -182,5 +204,7 @@ class CloudKitModel {
             }
             completion()
         }
+        
+        database.add(operation)
     }
 }

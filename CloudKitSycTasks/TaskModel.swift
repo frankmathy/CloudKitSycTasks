@@ -35,6 +35,11 @@ class TaskModel {
         context.reset()
     }
     
+    func save(task : Task) {
+        saveChanges()
+        cloudKitModel?.save(task: task)
+    }
+    
     func saveChanges() {
         guard let context = getContext() else { return }
         if context.hasChanges {
