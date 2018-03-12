@@ -11,8 +11,13 @@ import Foundation
 import CloudKit
 
 class CloudKitModel {
+    
+    static let sharedInstance = CloudKitModel()
+    
+    let recordNameTask = "Task"
+    let columnTaskName = "taskName"
+    let columnDone = "done"
 
-    let recordName = "Task"
     let privateSubscriptionId = "private-changes"
     let sharedSubscriptionId = "shared-changes"
     
@@ -21,11 +26,7 @@ class CloudKitModel {
     var privateDB : CKDatabase
     var sharedDB : CKDatabase
     
-    var taskModel : TaskModel?
-
-    init(taskModel : TaskModel) {
-        self.taskModel = taskModel
-        
+    init() {
         let container = CKContainer.default()
         privateDB = container.privateCloudDatabase
         sharedDB = container.sharedCloudDatabase
@@ -77,24 +78,29 @@ class CloudKitModel {
         // Fetch any changes from the server that happened while the app wasn't running
         createZoneGroup.notify(queue: DispatchQueue.global()) {
             if settings.createdCustomZone {
-                self.fetchChanges(in: .private, completion: { })
+                self.fetchChanges(in: .private, completion: {
+                    if TaskModel.sharedInstance.dataChangedHandler != nil {
+                        TaskModel.sharedInstance.dataChangedHandler!()
+                    }
+                })
                 // TODO self.fetchChanges(in: .shared, completion: { })
             }
         }
     }
     
     func save(task : Task) {
+        // TODO Persisting must wait until online if currently offline
         var record : CKRecord
         if task.cloudKitRecordName != nil {
             let recordId = CKRecordID(recordName: task.cloudKitRecordName!, zoneID: zoneID)
-            record = CKRecord(recordType: recordName, recordID: recordId)
+            record = CKRecord(recordType: recordNameTask, recordID: recordId)
         } else {
-            record = CKRecord(recordType: recordName, zoneID: zoneID)
+            record = CKRecord(recordType: recordNameTask, zoneID: zoneID)
             task.cloudKitRecordName = record.recordID.recordName
-            taskModel?.saveChanges()
+            TaskModel.sharedInstance.saveChanges()
         }
-        record["taskName"] = task.taskName as CKRecordValue?
-        record["done"] = task.done as CKRecordValue
+        record[columnTaskName] = task.taskName as CKRecordValue?
+        record[columnDone] = task.done as CKRecordValue
         privateDB.save(record) { (record, error) in
             guard error == nil else {
                 print("Error saving task to CloudKit with id)\(record!.recordID)")
@@ -178,8 +184,19 @@ class CloudKitModel {
         
         operation.recordChangedBlock = { (record) in
             // The block to execute with the contents of a changed record.
-            print("Record changed: ", record)
-            // TODO write record change to memory
+            if record.recordType == self.recordNameTask {
+                var task = TaskModel.sharedInstance.findTask(cloudKitRecordName: record.recordID.recordName)
+                if task == nil {
+                    print("Record creation received: ", record.recordID.recordName)
+                    task = Task(context: (TaskModel.sharedInstance.getContext())!)
+                    task?.cloudKitRecordName = record.recordID.recordName
+                } else {
+                    print("Record update received: ", record.recordID.recordName)
+                }
+                task?.taskName = record[self.columnTaskName] as! String
+                task?.done = record[self.columnDone] as! Bool
+                TaskModel.sharedInstance.saveChanges()
+            }
         }
         
         operation.recordWithIDWasDeletedBlock = { (recordId, tect) in

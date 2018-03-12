@@ -22,11 +22,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        print("Received notification")
-        guard let viewController = self.window?.rootViewController as? TaskListTableViewController else { return }
         let dict = userInfo as! [String: NSObject]
         guard let notification:CKDatabaseNotification = CKNotification(fromRemoteNotificationDictionary: dict) as? CKDatabaseNotification else { return }
-        viewController.model.cloudKitModel!.fetchChanges(in: notification.databaseScope) {
+        CloudKitModel.sharedInstance.fetchChanges(in: notification.databaseScope) {
+            if TaskModel.sharedInstance.dataChangedHandler != nil {
+                TaskModel.sharedInstance.dataChangedHandler!()
+            }
             completionHandler(.newData)
         }
     }

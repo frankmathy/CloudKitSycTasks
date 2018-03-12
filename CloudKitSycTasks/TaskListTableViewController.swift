@@ -11,14 +11,20 @@ import CoreData
 
 class TaskListTableViewController: UITableViewController {
     
-    let model = TaskModel()
+    let model = TaskModel.sharedInstance
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        model.dataChangedHandler = {
+            self.model.reload()
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
+        
         self.navigationItem.leftBarButtonItem = self.editButtonItem
         model.reload()
         self.tableView.reloadData()
-        model.cloudKitModel = CloudKitModel(taskModel: model)
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {

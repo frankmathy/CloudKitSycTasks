@@ -3,13 +3,13 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "CloudKitModel.init(taskModel:):CloudKitModel.swift">
+         contextName = "CloudKitModel.fetchZoneChanges(database:databaseTokenKey:zoneIDs:completion:):CloudKitModel.swift">
       </ContextState>
       <ContextState
-         contextName = "closure #3 in CloudKitModel.fetchDatabaseChanges(database:databaseTokenKey:completion:):CloudKitModel.swift">
+         contextName = "closure #1 in CloudKitModel.fetchZoneChanges(database:databaseTokenKey:zoneIDs:completion:):CloudKitModel.swift">
          <PersistentStrings>
             <PersistentString
-               value = "token.debugDescription">
+               value = "record.recordType">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -22,15 +22,23 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "CloudKitModel.fetchZoneChanges(database:databaseTokenKey:zoneIDs:completion:):CloudKitModel.swift">
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in CloudKitModel.fetchZoneChanges(database:databaseTokenKey:zoneIDs:completion:):CloudKitModel.swift">
+         contextName = "AppDelegate.application(_:didReceiveRemoteNotification:fetchCompletionHandler:):AppDelegate.swift">
          <PersistentStrings>
             <PersistentString
-               value = "record.recordType">
+               value = "self.window?.rootViewController">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #3 in CloudKitModel.fetchDatabaseChanges(database:databaseTokenKey:completion:):CloudKitModel.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "token.debugDescription">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "CloudKitModel.init(taskModel:):CloudKitModel.swift">
       </ContextState>
    </ContextStates>
 </VariablesViewState>

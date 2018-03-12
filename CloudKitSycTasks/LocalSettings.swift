@@ -57,11 +57,13 @@ class LocalSettings {
         guard let token = NSKeyedUnarchiver.unarchiveObject(with: data) as? CKServerChangeToken else {
             return nil
         }
+        print("Read change token for \(forKey): ", token)
         return token
     }
     
     func setChangeToken(forKey: String, newValue : CKServerChangeToken?) {
         if let token = newValue {
+            print("Write change token for \(forKey): ", newValue)
             let data = NSKeyedArchiver.archivedData(withRootObject: token)
             defaults.set(data, forKey: forKey)
         } else {

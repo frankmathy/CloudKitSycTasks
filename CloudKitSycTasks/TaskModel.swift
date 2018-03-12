@@ -11,17 +11,29 @@ import UIKit
 import CoreData
 
 class TaskModel {
+    static let sharedInstance = TaskModel()
+
     var tasks = [Task]()
-    var cloudKitModel : CloudKitModel?
     
-    private func getContext() -> NSManagedObjectContext? {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return nil }
-        return appDelegate.persistentContainer.viewContext
+    let cloudKitModel = CloudKitModel.sharedInstance
+    
+    var dataChangedHandler : (() -> Void)?
+    
+    let taskEntityName = "Task"
+    
+    var context : NSManagedObjectContext?
+    
+    public func getContext() -> NSManagedObjectContext? {
+        if context == nil {
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return nil }
+            context = appDelegate.persistentContainer.viewContext
+        }
+        return context
     }
     
     func reload() {
         guard let context = getContext() else { return }
-        let taskFetch = NSFetchRequest<Task>(entityName: "Task")
+        let taskFetch = NSFetchRequest<Task>(entityName: taskEntityName)
         do {
             tasks = try context.fetch(taskFetch)
         } catch let error as NSError {
@@ -37,7 +49,7 @@ class TaskModel {
     
     func save(task : Task) {
         saveChanges()
-        cloudKitModel?.save(task: task)
+        cloudKitModel.save(task: task)
     }
     
     func saveChanges() {
@@ -51,6 +63,21 @@ class TaskModel {
                 return
             }
         }
+    }
+    
+    func findTask(cloudKitRecordName : String) -> Task? {
+        guard let context = getContext() else { return nil }
+        let fetch = NSFetchRequest<Task>(entityName: taskEntityName)
+        fetch.predicate = NSPredicate(format: "cloudKitRecordName == %@", cloudKitRecordName)
+        do {
+            let records = try context.fetch(fetch)
+            if records.count > 0 {
+                return records.first
+            }
+        } catch let error as NSError {
+            print("Could not load task. \(error), \(error.userInfo)")
+        }
+        return nil
     }
     
     func deleteAtIndex(index : Int) {
