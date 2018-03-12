@@ -28,6 +28,8 @@ class CloudKitModel {
 
     var privateDB : CKDatabase
     var sharedDB : CKDatabase
+    
+    let reachability = Reachability()!
 
     init() {
         privateDB = container.privateCloudDatabase
@@ -93,8 +95,6 @@ class CloudKitModel {
     }
     
     func setupReachability() {
-        let reachability = Reachability()!
-        
         reachability.whenReachable = { reachability in
             if reachability.connection == .wifi {
                 print("Reachable via WiFi")
