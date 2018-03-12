@@ -24,14 +24,15 @@ class CloudKitModel {
     
     let zoneID = CKRecordZoneID(zoneName: "Todos", ownerName: CKCurrentUserDefaultName)
 
+    let container = CKContainer.default()
+
     var privateDB : CKDatabase
     var sharedDB : CKDatabase
-    
+
     init() {
-        let container = CKContainer.default()
         privateDB = container.privateCloudDatabase
         sharedDB = container.sharedCloudDatabase
-
+        
         let createZoneGroup = DispatchGroup()
         let settings = LocalSettings.sharedInstance
         
@@ -86,6 +87,29 @@ class CloudKitModel {
                 })
                 // TODO self.fetchChanges(in: .shared, completion: { })
             }
+        }
+
+        setupReachability()
+    }
+    
+    func setupReachability() {
+        let reachability = Reachability()!
+        
+        reachability.whenReachable = { reachability in
+            if reachability.connection == .wifi {
+                print("Reachable via WiFi")
+            } else {
+                print("Reachable via Cellular")
+            }
+        }
+        reachability.whenUnreachable = { _ in
+            print("Not reachable")
+        }
+        
+        do {
+            try reachability.startNotifier()
+        } catch {
+            print("Unable to start notifier")
         }
     }
     

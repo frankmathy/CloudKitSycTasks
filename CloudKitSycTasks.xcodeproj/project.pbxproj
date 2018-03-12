@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0122E92620573E910074C3A7 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0122E92520573E910074C3A7 /* Reachability.swift */; };
 		8547AA472054337E00E79117 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8547AA462054337E00E79117 /* AppDelegate.swift */; };
 		8547AA4C2054337E00E79117 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8547AA4A2054337E00E79117 /* Main.storyboard */; };
 		8547AA4F2054337E00E79117 /* CloudKitSycTasks.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8547AA4D2054337E00E79117 /* CloudKitSycTasks.xcdatamodeld */; };
@@ -21,6 +22,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0122E92520573E910074C3A7 /* Reachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		8547AA432054337E00E79117 /* CloudKitSycTasks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CloudKitSycTasks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8547AA462054337E00E79117 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8547AA4B2054337E00E79117 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -81,6 +83,7 @@
 				8547AA5F20543B9200E79117 /* TaskModel.swift */,
 				8547AA652054521400E79117 /* CloudKitModel.swift */,
 				8547AA692054771D00E79117 /* LocalSettings.swift */,
+				0122E92520573E910074C3A7 /* Reachability.swift */,
 			);
 			path = CloudKitSycTasks;
 			sourceTree = "<group>";
@@ -182,6 +185,7 @@
 				8547AA4F2054337E00E79117 /* CloudKitSycTasks.xcdatamodeld in Sources */,
 				8547AA6020543B9200E79117 /* TaskModel.swift in Sources */,
 				8547AA472054337E00E79117 /* AppDelegate.swift in Sources */,
+				0122E92620573E910074C3A7 /* Reachability.swift in Sources */,
 				8547AA5E2054392800E79117 /* EditTaskViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
