@@ -93,18 +93,30 @@ class CloudKitModel {
         var record : CKRecord
         if task.cloudKitRecordName != nil {
             let recordId = CKRecordID(recordName: task.cloudKitRecordName!, zoneID: zoneID)
+            privateDB.fetch(withRecordID: recordId, completionHandler: { (record, error) in
+                if let record = record, error == nil {
+                    record[self.columnTaskName] = task.taskName as CKRecordValue?
+                    record[self.columnDone] = task.done as CKRecordValue
+                    self.privateDB.save(record) { (record, error) in
+                        guard error == nil else {
+                            print("Error saving task to CloudKit:)\(error!)")
+                            return
+                        }
+                    }
+                }
+            })
             record = CKRecord(recordType: recordNameTask, recordID: recordId)
         } else {
             record = CKRecord(recordType: recordNameTask, zoneID: zoneID)
             task.cloudKitRecordName = record.recordID.recordName
-            TaskModel.sharedInstance.saveChanges()
-        }
-        record[columnTaskName] = task.taskName as CKRecordValue?
-        record[columnDone] = task.done as CKRecordValue
-        privateDB.save(record) { (record, error) in
-            guard error == nil else {
-                print("Error saving task to CloudKit with id)\(record!.recordID)")
-                return
+            record[columnTaskName] = task.taskName as CKRecordValue?
+            record[columnDone] = task.done as CKRecordValue
+            privateDB.save(record) { (record, error) in
+                guard error == nil else {
+                    print("Error saving task to CloudKit:)\(error!)")
+                    return
+                }
+                TaskModel.sharedInstance.saveChanges()
             }
         }
     }
