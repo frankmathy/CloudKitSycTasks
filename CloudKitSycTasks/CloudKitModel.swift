@@ -9,6 +9,7 @@
 
 import Foundation
 import CloudKit
+import CoreData
 
 class CloudKitModel {
     
