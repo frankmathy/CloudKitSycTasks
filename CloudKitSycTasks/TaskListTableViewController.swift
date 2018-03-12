@@ -90,7 +90,6 @@ class TaskListTableViewController: UITableViewController {
     }
 
     @IBAction func cancelEditTaskViewController(_ segue: UIStoryboardSegue) {
-        model.cancelChanges()
     }
 }
 

@@ -95,9 +95,6 @@
                                             </label>
                                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4NH-BM-M14">
                                                 <rect key="frame" x="302" y="0.0" width="51" height="31"/>
-                                                <connections>
-                                                    <action selector="completedSwitchChanged:" destination="ati-ww-AWb" eventType="valueChanged" id="gX9-Oz-60T"/>
-                                                </connections>
                                             </switch>
                                         </subviews>
                                     </stackView>
@@ -121,12 +118,12 @@
                     <navigationItem key="navigationItem" title="Edit Task" id="j9u-YB-gS8">
                         <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="En0-y8-UaW">
                             <connections>
-                                <segue destination="iZo-Rc-cBS" kind="unwind" unwindAction="cancelEditTaskViewController:" id="nbz-SJ-eCg"/>
+                                <segue destination="iZo-Rc-cBS" kind="unwind" unwindAction="cancelEditTaskViewController:" id="gev-RN-6nv"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="save" id="oCG-LP-cUr">
                             <connections>
-                                <segue destination="iZo-Rc-cBS" kind="unwind" unwindAction="saveEditTaskViewController:" id="Low-3e-XuY"/>
+                                <segue destination="iZo-Rc-cBS" kind="unwind" identifier="save" unwindAction="saveEditTaskViewController:" id="Low-3e-XuY"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>

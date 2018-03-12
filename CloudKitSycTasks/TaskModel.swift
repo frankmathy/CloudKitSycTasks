@@ -82,6 +82,7 @@ class TaskModel {
     
     func deleteAtIndex(index : Int) {
         let task = tasks[index]
+        cloudKitModel.delete(task: task)
         guard let context = getContext() else { return }
         context.delete(task)
         saveChanges()

@@ -27,15 +27,17 @@ class EditTaskViewController: UIViewController {
     }
     
     @IBAction func onDescriptiontChanged(_ sender: UITextField) {
-        task?.taskName = taskDescriptionField.text
         updateSaveButtonState()
-    }
-    
-    @IBAction func completedSwitchChanged(_ sender: UISwitch) {
-        task?.done = taskCompletedSwitch.isOn
     }
     
     private func updateSaveButtonState() {
         saveButton.isEnabled = taskDescriptionField.text!.count > 0
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "save" {
+            task?.taskName = taskDescriptionField.text
+            task?.done = taskCompletedSwitch.isOn
+        }
     }
 }

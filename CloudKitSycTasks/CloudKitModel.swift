@@ -92,8 +92,9 @@ class CloudKitModel {
     func save(task : Task) {
         // TODO Persisting must wait until online if currently offline
         var record : CKRecord
-        if task.cloudKitRecordName != nil {
-            let recordId = CKRecordID(recordName: task.cloudKitRecordName!, zoneID: zoneID)
+        if task.cloudKitRecordName != nil && task.cloudKitZoneName != nil && task.cloudKitOwnerName != nil {
+            let zoneId = CKRecordZoneID(zoneName: task.cloudKitZoneName!, ownerName: task.cloudKitOwnerName!)
+            let recordId = CKRecordID(recordName: task.cloudKitRecordName!, zoneID: zoneId)
             privateDB.fetch(withRecordID: recordId, completionHandler: { (record, error) in
                 if let record = record, error == nil {
                     record[self.columnTaskName] = task.taskName as CKRecordValue?
@@ -110,6 +111,8 @@ class CloudKitModel {
         } else {
             record = CKRecord(recordType: recordNameTask, zoneID: zoneID)
             task.cloudKitRecordName = record.recordID.recordName
+            task.cloudKitZoneName = record.recordID.zoneID.zoneName
+            task.cloudKitOwnerName = record.recordID.zoneID.ownerName
             record[columnTaskName] = task.taskName as CKRecordValue?
             record[columnDone] = task.done as CKRecordValue
             privateDB.save(record) { (record, error) in
@@ -118,6 +121,18 @@ class CloudKitModel {
                     return
                 }
                 TaskModel.sharedInstance.saveChanges()
+            }
+        }
+    }
+    
+    func delete(task : Task) {
+        if task.cloudKitRecordName != nil && task.cloudKitOwnerName != nil && task.cloudKitZoneName != nil {
+            let recordId = CKRecordID(recordName: task.cloudKitRecordName!, zoneID: CKRecordZoneID(zoneName: task.cloudKitZoneName!, ownerName: task.cloudKitOwnerName!))
+            privateDB.delete(withRecordID: recordId) { (recordId, error) in
+                guard error == nil else {
+                    print("Error deleting task from CloudKit:)\(error!)")
+                    return
+                }
             }
         }
     }
@@ -203,6 +218,8 @@ class CloudKitModel {
                     print("Record creation received: ", record.recordID.recordName)
                     task = Task(context: (TaskModel.sharedInstance.getContext())!)
                     task?.cloudKitRecordName = record.recordID.recordName
+                    task?.cloudKitZoneName = record.recordID.zoneID.zoneName
+                    task?.cloudKitOwnerName = record.recordID.zoneID.ownerName
                 } else {
                     print("Record update received: ", record.recordID.recordName)
                 }
@@ -212,10 +229,14 @@ class CloudKitModel {
             }
         }
         
-        operation.recordWithIDWasDeletedBlock = { (recordId, tect) in
+        operation.recordWithIDWasDeletedBlock = { (recordId, text) in
             // The block to execute with the ID of a record that was deleted.
             print("Record deleted:", recordId)
-            // TODO Write this record deletion to memory
+            let task = TaskModel.sharedInstance.findTask(cloudKitRecordName: recordId.recordName)
+            if task != nil {
+                TaskModel.sharedInstance.context?.delete(task!)
+                TaskModel.sharedInstance.saveChanges()
+            }
         }
         
         operation.recordZoneChangeTokensUpdatedBlock = { (zoneId, token, data) in
@@ -224,7 +245,7 @@ class CloudKitModel {
         
         operation.recordZoneFetchCompletionBlock = { (zoneId, changeToken, _, _, error) in
             // The block to execute when the fetch for a zone has completed.
-            print("Zone Change token updated2:", changeToken)
+            print("Zone Change token updated:", changeToken)
             settings.setChangeToken(forKey: databaseTokenKey, newValue: changeToken)
         }
         
