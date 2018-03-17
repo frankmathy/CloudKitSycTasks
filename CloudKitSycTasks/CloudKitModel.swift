@@ -94,6 +94,26 @@ class CloudKitModel {
         setupReachability()
     }
     
+    fileprivate func syncLocalChangesToCloudKit() {
+        // Save dirty tasks to iCloud
+        let tasks = TaskModel.sharedInstance.findDirtyTasks()
+        if tasks != nil {
+            print("Syncing \(tasks!.count) updates/inserts to CloudKit")
+            for task in tasks! {
+                self.saveToCloudKit(task: task)
+            }
+        }
+        
+        // Delete required tasks to iCloud
+        let deletions = TaskModel.sharedInstance.findAllDeletions()
+        if deletions != nil {
+            print("Syncing \(deletions!.count) deletions to CloudKit")
+            for deletion in deletions! {
+                self.deleteTask(recordName: deletion.cloudKitRecordName!, zoneName: deletion.cloudKitZoneName!, ownerName: deletion.cloudKitOwnerName!)
+            }
+        }
+    }
+    
     func setupReachability() {
         reachability.whenReachable = { reachability in
             if reachability.connection == .wifi {
@@ -101,6 +121,8 @@ class CloudKitModel {
             } else {
                 print("Reachable via Cellular")
             }
+            
+            self.syncLocalChangesToCloudKit()
         }
         reachability.whenUnreachable = { _ in
             print("Not reachable")
@@ -113,8 +135,13 @@ class CloudKitModel {
         }
     }
     
-    func save(task : Task) {
-        // TODO Persisting must wait until online if currently offline
+    func save(task: Task) {
+        if reachability.connection != .none {
+            saveToCloudKit(task: task)
+        }
+    }
+    
+    func saveToCloudKit(task : Task) {
         var record : CKRecord
         if task.cloudKitRecordName != nil && task.cloudKitZoneName != nil && task.cloudKitOwnerName != nil {
             let zoneId = CKRecordZoneID(zoneName: task.cloudKitZoneName!, ownerName: task.cloudKitOwnerName!)
@@ -128,6 +155,9 @@ class CloudKitModel {
                             print("Error saving task to CloudKit:)\(error!)")
                             return
                         }
+                        // Flag save success
+                        task.cloudKitDirtyFlag = false
+                        TaskModel.sharedInstance.saveChanges()
                     }
                 }
             })
@@ -149,14 +179,23 @@ class CloudKitModel {
         }
     }
     
+    fileprivate func deleteTask(recordName : String, zoneName : String, ownerName: String) {
+        let recordId = CKRecordID(recordName: recordName, zoneID: CKRecordZoneID(zoneName: zoneName, ownerName: ownerName))
+        privateDB.delete(withRecordID: recordId) { (recordId, error) in
+            guard error == nil else {
+                print("Error deleting task from CloudKit:)\(error!)")
+                return
+            }
+            TaskModel.sharedInstance.deleteDeleteTask(ownerName: ownerName, recordName: recordName, zoneName: zoneName)
+        }
+    }
+    
     func delete(task : Task) {
         if task.cloudKitRecordName != nil && task.cloudKitOwnerName != nil && task.cloudKitZoneName != nil {
-            let recordId = CKRecordID(recordName: task.cloudKitRecordName!, zoneID: CKRecordZoneID(zoneName: task.cloudKitZoneName!, ownerName: task.cloudKitOwnerName!))
-            privateDB.delete(withRecordID: recordId) { (recordId, error) in
-                guard error == nil else {
-                    print("Error deleting task from CloudKit:)\(error!)")
-                    return
-                }
+            if reachability.connection != .none {
+                deleteTask(recordName: task.cloudKitRecordName!, zoneName: task.cloudKitZoneName!, ownerName: task.cloudKitOwnerName!)
+            } else {
+                
             }
         }
     }
@@ -235,6 +274,7 @@ class CloudKitModel {
         let operation = CKFetchRecordZoneChangesOperation(recordZoneIDs: zoneIDs, optionsByRecordZoneID: optionsByRecordZoneID)
         
         operation.recordChangedBlock = { (record) in
+            // Sync CloudKit record change to local Core Data database
             // The block to execute with the contents of a changed record.
             if record.recordType == self.recordNameTask {
                 var task = TaskModel.sharedInstance.findTask(cloudKitRecordName: record.recordID.recordName)
@@ -254,7 +294,7 @@ class CloudKitModel {
         }
         
         operation.recordWithIDWasDeletedBlock = { (recordId, text) in
-            // The block to execute with the ID of a record that was deleted.
+            // Sync CloudKit deletion to local Core Data database
             print("Record deleted:", recordId)
             let task = TaskModel.sharedInstance.findTask(cloudKitRecordName: recordId.recordName)
             if task != nil {

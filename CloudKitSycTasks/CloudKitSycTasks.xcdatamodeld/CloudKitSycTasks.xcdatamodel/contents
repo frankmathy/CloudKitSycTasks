@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="13772" systemVersion="17D102" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="CloudKitDeleteTask" representedClassName="CloudKitDeleteTask" syncable="YES" codeGenerationType="class">
+        <attribute name="cloudKitOwnerName" attributeType="String" syncable="YES"/>
+        <attribute name="cloudKitRecordName" attributeType="String" syncable="YES"/>
+        <attribute name="cloudKitZoneName" attributeType="String" syncable="YES"/>
+    </entity>
     <entity name="Task" representedClassName="Task" syncable="YES" codeGenerationType="class">
+        <attribute name="cloudKitDirtyFlag" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="cloudKitOwnerName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="cloudKitRecordName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="cloudKitZoneName" optional="YES" attributeType="String" syncable="YES"/>
@@ -8,6 +14,7 @@
         <attribute name="taskName" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Task" positionX="-63" positionY="-18" width="128" height="120"/>
+        <element name="Task" positionX="-63" positionY="-18" width="128" height="135"/>
+        <element name="CloudKitDeleteTask" positionX="-63" positionY="18" width="128" height="90"/>
     </elements>
 </model>

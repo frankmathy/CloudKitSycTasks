@@ -21,6 +21,8 @@ class TaskModel {
     
     let taskEntityName = "Task"
     
+    let cloudKitDeleteTaskEntityName = "CloudKitDeleteTask"
+    
     var context : NSManagedObjectContext?
     
     public func getContext() -> NSManagedObjectContext? {
@@ -48,7 +50,10 @@ class TaskModel {
     }
     
     func save(task : Task) {
+        task.cloudKitDirtyFlag = true
         saveChanges()
+        
+        // Propagate to CloudKit
         cloudKitModel.save(task: task)
     }
     
@@ -81,12 +86,64 @@ class TaskModel {
     }
     
     func deleteAtIndex(index : Int) {
-        let task = tasks[index]
-        cloudKitModel.delete(task: task)
+        // Add deletion for CloudKit sync
         guard let context = getContext() else { return }
+        let task = tasks[index]
+        if task.cloudKitOwnerName != nil && task.cloudKitZoneName != nil && task.cloudKitRecordName != nil {
+            let deleteTask = CloudKitDeleteTask(context: context)
+            deleteTask.cloudKitOwnerName = task.cloudKitOwnerName!
+            deleteTask.cloudKitRecordName = task.cloudKitRecordName!
+            deleteTask.cloudKitZoneName = task.cloudKitZoneName!
+        }
+
+        // Delete task
         context.delete(task)
         saveChanges()
+
+        // Propagate to CloudKit
+        cloudKitModel.delete(task: task)
     }
     
+    func findDirtyTasks() -> [Task]? {
+        guard let context = getContext() else { return nil }
+        let fetch = NSFetchRequest<Task>(entityName: taskEntityName)
+        fetch.predicate = NSPredicate(format: "cloudKitDirtyFlag == YES")
+        do {
+            let records = try context.fetch(fetch)
+            return records
+        } catch let error as NSError {
+            print("Could not load task. \(error), \(error.userInfo)")
+        }
+        return nil
+    }
     
+    func findAllDeletions() -> [CloudKitDeleteTask]? {
+        guard let context = getContext() else { return nil }
+        let fetch = NSFetchRequest<CloudKitDeleteTask>(entityName: cloudKitDeleteTaskEntityName)
+        do {
+            let records = try context.fetch(fetch)
+            return records
+        } catch let error as NSError {
+            print("Could not load deletions. \(error), \(error.userInfo)")
+        }
+        return nil
+    }
+    
+    func deleteDeleteTask(ownerName : String, recordName : String, zoneName : String) {
+        guard let context = getContext() else { return }
+        let fetch = NSFetchRequest<CloudKitDeleteTask>(entityName: cloudKitDeleteTaskEntityName)
+        let ownerPredicate = NSPredicate(format: "cloudKitOwnerName == %@", ownerName)
+        let recordNamePredicate = NSPredicate(format: "cloudKitRecordName == %@", recordName)
+        let zoneNamePredicate = NSPredicate(format: "cloudKitZoneName == %@", zoneName)
+        fetch.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [ownerPredicate, recordNamePredicate, zoneNamePredicate])
+        do {
+            let records = try context.fetch(fetch)
+            print("Removing \(records.count) delete tasks for record \(recordName)")
+            for record in records {
+                context.delete(record)
+            }
+        } catch let error as NSError {
+            print("Could not remove delete tasks for recordName \(recordName): \(error), \(error.userInfo)")
+        }
+    }
 }
