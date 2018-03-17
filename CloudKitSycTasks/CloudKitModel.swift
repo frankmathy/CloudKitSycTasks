@@ -195,8 +195,6 @@ class CloudKitModel {
         if task.cloudKitRecordName != nil && task.cloudKitOwnerName != nil && task.cloudKitZoneName != nil {
             if reachability.connection != .none {
                 deleteTask(recordName: task.cloudKitRecordName!, zoneName: task.cloudKitZoneName!, ownerName: task.cloudKitOwnerName!)
-            } else {
-                
             }
         }
     }
@@ -290,6 +288,7 @@ class CloudKitModel {
                 }
                 task?.taskName = record[self.columnTaskName] as! String
                 task?.done = record[self.columnDone] as! Bool
+                task?.cloudKitDirtyFlag = false
                 TaskModel.sharedInstance.saveChanges()
             }
         }
