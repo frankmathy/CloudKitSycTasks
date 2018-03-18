@@ -36,15 +36,15 @@ class TaskListTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TaskCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TaskCell", for: indexPath) as? TaskTableViewCell
         let task = model.tasks[indexPath.row]
-        cell.textLabel?.text = task.taskName
+        cell?.taskDescriptionField.text = task.taskName
         if task.done {
-            cell.detailTextLabel?.text = "Done"
+            cell?.statusField.text = "Done"
         } else {
-            cell.detailTextLabel?.text = "Todo"
+            cell?.statusField.text = "Todo"
         }
-        return cell
+        return cell!
     }
 
     // Override to support editing the table view.
@@ -91,5 +91,13 @@ class TaskListTableViewController: UITableViewController {
 
     @IBAction func cancelEditTaskViewController(_ segue: UIStoryboardSegue) {
     }
+    
+    @IBAction func shareButtonPressed(_ sender: UIButton) {
+        let pointInTable = sender.convert(sender.bounds.origin, to: self.tableView)
+        let cellIndexPath = self.tableView.indexPathForRow(at: pointInTable)
+        let task = model.tasks[cellIndexPath!.row]
+        print("Clicked share button for task: \(task.taskName!)")
+    }
+    
 }
 
