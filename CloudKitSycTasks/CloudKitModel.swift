@@ -323,4 +323,62 @@ class CloudKitModel {
         
         database.add(operation)
     }
+    
+    func shareTask(task : Task, sender : UIControl, viewController : TaskListTableViewController) {
+        if task.cloudKitOwnerName != nil && task.cloudKitRecordName != nil && task.cloudKitRecordName != nil {
+            let recordId = CKRecordID(recordName: task.cloudKitRecordName!, zoneID: CKRecordZoneID(zoneName: task.cloudKitZoneName!, ownerName: task.cloudKitOwnerName!))
+            privateDB.fetch(withRecordID: recordId, completionHandler: { (record, error) in
+                if let error = error {
+                    print("Error fetching record with id \(recordId):", error)
+                    return
+                }
+                
+                if let shareRef = record?.share {
+                    // Already shared
+                    self.privateDB.fetch(withRecordID: shareRef.recordID, completionHandler: { (shareRecord, error) in
+                        if let error = error {
+                            print("Error fetching share record with id \(recordId):", error)
+                            return
+                        }
+                        guard let share = shareRecord as? CKShare else {
+                            print("Incorrect share record with id \(recordId):", error)
+                            return
+                        }
+                        let sharingController = UICloudSharingController(share: share, container: self.container)
+                        sharingController.delegate = viewController
+                        sharingController.availablePermissions = [.allowPublic, .allowPrivate, .allowReadOnly, .allowReadWrite]
+                        viewController.present(sharingController, animated: true, completion: {
+                        })
+                    })
+                } else {
+                    // Create new share
+                    let sharingController = UICloudSharingController(preparationHandler: { (sharingController, prepareCompletionHandler) in
+                        let shareId = CKRecordID(recordName: UUID().uuidString, zoneID: self.zoneID)
+                        var share = CKShare(rootRecord: record!, shareID: shareId)
+                        share[CKShareTitleKey] = "Task" as CKRecordValue
+                        share.publicPermission = .none
+                        record!.parent = nil
+                        
+                        let modifyRecordsOp = CKModifyRecordsOperation(recordsToSave: [share, record!], recordIDsToDelete: nil)
+                        modifyRecordsOp.modifyRecordsCompletionBlock = { records, recordIDs, error in
+                            if let ckError = error as? CKError {
+                                print("Error saving records:", error)
+                                share = ckError.serverRecord! as! CKShare
+                            }
+                            prepareCompletionHandler(share, self.container, error)
+                        }
+                        modifyRecordsOp.database = self.privateDB
+                        let operationQueue = OperationQueue()
+                        operationQueue.maxConcurrentOperationCount = 1
+                        operationQueue.addOperation(modifyRecordsOp)
+                    })
+                    sharingController.delegate = viewController
+                    sharingController.availablePermissions = [.allowPublic, .allowPrivate, .allowReadOnly, .allowReadWrite]
+                    viewController.present(sharingController, animated: true, completion: {
+                    })
+
+                }
+            })
+        }
+    }
 }

@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class TaskListTableViewController: UITableViewController {
+class TaskListTableViewController: UITableViewController, UICloudSharingControllerDelegate {
     
     let model = TaskModel.sharedInstance
 
@@ -97,6 +97,21 @@ class TaskListTableViewController: UITableViewController {
         let cellIndexPath = self.tableView.indexPathForRow(at: pointInTable)
         let task = model.tasks[cellIndexPath!.row]
         print("Clicked share button for task: \(task.taskName!)")
+        CloudKitModel.sharedInstance.shareTask(task: task, sender: sender, viewController: self)
+    }
+    
+    // Failing to share a cache
+    func cloudSharingController(_ csc: UICloudSharingController, failedToSaveShareWithError error: Error) {
+        let alert = UIAlertController(title: "Failed to save a share.",
+                                      message: "\(error) ", preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
+        self.present(alert, animated: true) {
+        }
+    }
+    
+    func itemTitle(for csc: UICloudSharingController) -> String? {
+        return "Task"
     }
     
 }
