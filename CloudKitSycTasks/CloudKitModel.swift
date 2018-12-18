@@ -205,9 +205,9 @@ class CloudKitModel {
         notificationInfo.shouldSendContentAvailable = true
         subscription.notificationInfo = notificationInfo
         
-        let operation = CKModifySubscriptionsOperation(subscriptionsToSave: [subscription], subscriptionIDsToDelete: [])
-        operation.qualityOfService = .utility
-        return operation
+        let modifySubscriptionsOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subscription], subscriptionIDsToDelete: [])
+        modifySubscriptionsOperation.qualityOfService = .utility
+        return modifySubscriptionsOperation
     }
     
     func fetchChanges(in databaseScope: CKDatabaseScope, completion: @escaping () -> Void) {
@@ -225,24 +225,24 @@ class CloudKitModel {
         var changedZoneIDs: [CKRecordZoneID] = []
         
         let changeToken = LocalSettings.sharedInstance.getChangeToken(forKey: databaseTokenKey)
-        let operation = CKFetchDatabaseChangesOperation(previousServerChangeToken: changeToken)
+        let fetchDatabaseChangesOperation = CKFetchDatabaseChangesOperation(previousServerChangeToken: changeToken)
         
-        operation.recordZoneWithIDChangedBlock = { (zoneID) in
+        fetchDatabaseChangesOperation.recordZoneWithIDChangedBlock = { (zoneID) in
             // The block that processes a single record zone change.
             changedZoneIDs.append(zoneID)
         }
         
-        operation.recordZoneWithIDWasDeletedBlock = { (zoneID) in
+        fetchDatabaseChangesOperation.recordZoneWithIDWasDeletedBlock = { (zoneID) in
             // The block that processes a single record zone deletion.
             // TODO Write this zone deletion to memory
         }
         
-        operation.changeTokenUpdatedBlock = { (token) in
+        fetchDatabaseChangesOperation.changeTokenUpdatedBlock = { (token) in
             // Write this new database change token to memory
             print("Token Updated")
         }
         
-        operation.fetchDatabaseChangesCompletionBlock = { (token, moreComing, error) in
+        fetchDatabaseChangesOperation.fetchDatabaseChangesCompletionBlock = { (token, moreComing, error) in
             // The block to execute when the operation completes.
             if let error = error {
                 print("Error during fetch shared database changes operation", error)
@@ -256,8 +256,8 @@ class CloudKitModel {
             })
         }
         
-        operation.qualityOfService = .userInitiated
-        database.add(operation)
+        fetchDatabaseChangesOperation.qualityOfService = .userInitiated
+        database.add(fetchDatabaseChangesOperation)
     }
     
     func fetchZoneChanges(database: CKDatabase, databaseTokenKey: String, zoneIDs: [CKRecordZoneID],  completion: @escaping () -> Void) {
@@ -270,9 +270,9 @@ class CloudKitModel {
             optionsByRecordZoneID[zoneID] = options
         }
         
-        let operation = CKFetchRecordZoneChangesOperation(recordZoneIDs: zoneIDs, optionsByRecordZoneID: optionsByRecordZoneID)
+        let fetchRecordZoneChangesOperation = CKFetchRecordZoneChangesOperation(recordZoneIDs: zoneIDs, optionsByRecordZoneID: optionsByRecordZoneID)
         
-        operation.recordChangedBlock = { (record) in
+        fetchRecordZoneChangesOperation.recordChangedBlock = { (record) in
             // Sync CloudKit record change to local Core Data database
             // The block to execute with the contents of a changed record.
             if record.recordType == self.recordNameTask {
@@ -293,7 +293,7 @@ class CloudKitModel {
             }
         }
         
-        operation.recordWithIDWasDeletedBlock = { (recordId, text) in
+        fetchRecordZoneChangesOperation.recordWithIDWasDeletedBlock = { (recordId, text) in
             // Sync CloudKit deletion to local Core Data database
             print("Record deleted:", recordId)
             let task = TaskModel.sharedInstance.findTask(cloudKitRecordName: recordId.recordName)
@@ -303,17 +303,17 @@ class CloudKitModel {
             }
         }
         
-        operation.recordZoneChangeTokensUpdatedBlock = { (zoneId, token, data) in
+        fetchRecordZoneChangesOperation.recordZoneChangeTokensUpdatedBlock = { (zoneId, token, data) in
             // The block to execute when the change token has been updated.
         }
         
-        operation.recordZoneFetchCompletionBlock = { (zoneId, changeToken, _, _, error) in
+        fetchRecordZoneChangesOperation.recordZoneFetchCompletionBlock = { (zoneId, changeToken, _, _, error) in
             // The block to execute when the fetch for a zone has completed.
             print("Zone Change token updated:", changeToken)
             settings.setChangeToken(forKey: databaseTokenKey, newValue: changeToken)
         }
         
-        operation.fetchRecordZoneChangesCompletionBlock = { (error) in
+        fetchRecordZoneChangesOperation.fetchRecordZoneChangesCompletionBlock = { (error) in
             // The block to use to process the record zone changes
             if let error = error {
                 print("Error fetching zone changes for \(databaseTokenKey) database:", error)
@@ -321,7 +321,7 @@ class CloudKitModel {
             completion()
         }
         
-        database.add(operation)
+        database.add(fetchRecordZoneChangesOperation)
     }
     
     func shareTask(task : Task, sender : UIControl, viewController : TaskListTableViewController) {
