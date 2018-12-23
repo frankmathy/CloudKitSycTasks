@@ -88,7 +88,11 @@ class CloudKitModel {
                         TaskModel.sharedInstance.dataChangedHandler!()
                     }
                 })
-                // TODO self.fetchChanges(in: .shared, completion: { })
+                self.fetchChanges(in: .shared, completion: {
+                    if TaskModel.sharedInstance.dataChangedHandler != nil {
+                        TaskModel.sharedInstance.dataChangedHandler!()
+                    }
+                })
             }
         }
 

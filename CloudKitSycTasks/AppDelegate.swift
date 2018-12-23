@@ -24,6 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         let dict = userInfo as! [String: NSObject]
         guard let notification:CKDatabaseNotification = CKNotification(fromRemoteNotificationDictionary: dict) as? CKDatabaseNotification else { return }
+        print("Received notification with database scope: \(notification.databaseScope)")
         CloudKitModel.sharedInstance.fetchChanges(in: notification.databaseScope) {
             if TaskModel.sharedInstance.dataChangedHandler != nil {
                 TaskModel.sharedInstance.dataChangedHandler!()
