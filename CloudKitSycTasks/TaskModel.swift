@@ -94,6 +94,7 @@ class TaskModel {
             deleteTask.cloudKitOwnerName = task.cloudKitOwnerName!
             deleteTask.cloudKitRecordName = task.cloudKitRecordName!
             deleteTask.cloudKitZoneName = task.cloudKitZoneName!
+            deleteTask.cloudKitSharedDB = task.cloudKitSharedDB
         }
 
         // Delete task

@@ -110,7 +110,7 @@ class CloudKitModel {
         if deletions != nil {
             print("Syncing \(deletions!.count) deletions to CloudKit")
             for deletion in deletions! {
-                self.deleteTask(recordName: deletion.cloudKitRecordName!, zoneName: deletion.cloudKitZoneName!, ownerName: deletion.cloudKitOwnerName!)
+                self.deleteTask(inSharedDB: deletion.cloudKitSharedDB, recordName: deletion.cloudKitRecordName!, zoneName: deletion.cloudKitZoneName!, ownerName: deletion.cloudKitOwnerName!)
             }
         }
     }
@@ -144,14 +144,15 @@ class CloudKitModel {
     
     func saveToCloudKit(task : Task) {
         var record : CKRecord
+        let db = task.cloudKitSharedDB ? sharedDB : privateDB
         if task.cloudKitRecordName != nil && task.cloudKitZoneName != nil && task.cloudKitOwnerName != nil {
             let zoneId = CKRecordZoneID(zoneName: task.cloudKitZoneName!, ownerName: task.cloudKitOwnerName!)
             let recordId = CKRecordID(recordName: task.cloudKitRecordName!, zoneID: zoneId)
-            privateDB.fetch(withRecordID: recordId, completionHandler: { (record, error) in
+            db.fetch(withRecordID: recordId, completionHandler: { (record, error) in
                 if let record = record, error == nil {
                     record[self.columnTaskName] = task.taskName as CKRecordValue?
                     record[self.columnDone] = task.done as CKRecordValue
-                    self.privateDB.save(record) { (record, error) in
+                    db.save(record) { (record, error) in
                         guard error == nil else {
                             print("Error saving task to CloudKit:)\(error!)")
                             return
@@ -170,7 +171,7 @@ class CloudKitModel {
             task.cloudKitOwnerName = record.recordID.zoneID.ownerName
             record[columnTaskName] = task.taskName as CKRecordValue?
             record[columnDone] = task.done as CKRecordValue
-            privateDB.save(record) { (record, error) in
+            db.save(record) { (record, error) in
                 guard error == nil else {
                     print("Error saving task to CloudKit:)\(error!)")
                     return
@@ -180,9 +181,10 @@ class CloudKitModel {
         }
     }
     
-    fileprivate func deleteTask(recordName : String, zoneName : String, ownerName: String) {
+    fileprivate func deleteTask(inSharedDB : Bool, recordName : String, zoneName : String, ownerName: String) {
+        let db = inSharedDB ? sharedDB : privateDB
         let recordId = CKRecordID(recordName: recordName, zoneID: CKRecordZoneID(zoneName: zoneName, ownerName: ownerName))
-        privateDB.delete(withRecordID: recordId) { (recordId, error) in
+        db.delete(withRecordID: recordId) { (recordId, error) in
             guard error == nil else {
                 print("Error deleting task from CloudKit:)\(error!)")
                 return
@@ -194,7 +196,7 @@ class CloudKitModel {
     func delete(task : Task) {
         if task.cloudKitRecordName != nil && task.cloudKitOwnerName != nil && task.cloudKitZoneName != nil {
             if reachability.connection != .none {
-                deleteTask(recordName: task.cloudKitRecordName!, zoneName: task.cloudKitZoneName!, ownerName: task.cloudKitOwnerName!)
+                deleteTask(inSharedDB: task.cloudKitSharedDB, recordName: task.cloudKitRecordName!, zoneName: task.cloudKitZoneName!, ownerName: task.cloudKitOwnerName!)
             }
         }
     }
@@ -222,6 +224,9 @@ class CloudKitModel {
     }
     
     func fetchDatabaseChanges(database: CKDatabase, databaseTokenKey: String, completion: @escaping () -> Void) {
+        
+        print("Fetching database changes for database: \(databaseTokenKey)")
+        
         var changedZoneIDs: [CKRecordZoneID] = []
         
         let changeToken = LocalSettings.sharedInstance.getChangeToken(forKey: databaseTokenKey)
@@ -229,6 +234,7 @@ class CloudKitModel {
         
         fetchDatabaseChangesOperation.recordZoneWithIDChangedBlock = { (zoneID) in
             // The block that processes a single record zone change.
+            print("Received changes in Zone \(databaseTokenKey).\(zoneID.zoneName)")
             changedZoneIDs.append(zoneID)
         }
         
@@ -276,17 +282,19 @@ class CloudKitModel {
             // Sync CloudKit record change to local Core Data database
             // The block to execute with the contents of a changed record.
             if record.recordType == self.recordNameTask {
+                let taskName = record[self.columnTaskName] as! String
                 var task = TaskModel.sharedInstance.findTask(cloudKitRecordName: record.recordID.recordName)
                 if task == nil {
-                    print("Record creation received: ", record.recordID.recordName)
+                    print("Record creation received: \(record.recordID.recordName) - \(taskName)")
                     task = Task(context: (TaskModel.sharedInstance.getContext())!)
                     task?.cloudKitRecordName = record.recordID.recordName
                     task?.cloudKitZoneName = record.recordID.zoneID.zoneName
                     task?.cloudKitOwnerName = record.recordID.zoneID.ownerName
+                    task?.cloudKitSharedDB = database == self.sharedDB
                 } else {
-                    print("Record update received: ", record.recordID.recordName)
+                    print("Record update received: \(record.recordID.recordName) - \(taskName)")
                 }
-                task?.taskName = record[self.columnTaskName] as! String
+                task?.taskName = taskName
                 task?.done = record[self.columnDone] as! Bool
                 task?.cloudKitDirtyFlag = false
                 TaskModel.sharedInstance.saveChanges()
@@ -325,7 +333,7 @@ class CloudKitModel {
     }
     
     func shareTask(task : Task, sender : UIControl, viewController : TaskListTableViewController) {
-        if task.cloudKitOwnerName != nil && task.cloudKitRecordName != nil && task.cloudKitRecordName != nil {
+        if task.cloudKitOwnerName != nil && !task.cloudKitSharedDB && task.cloudKitRecordName != nil && task.cloudKitRecordName != nil {
             let recordId = CKRecordID(recordName: task.cloudKitRecordName!, zoneID: CKRecordZoneID(zoneName: task.cloudKitZoneName!, ownerName: task.cloudKitOwnerName!))
             privateDB.fetch(withRecordID: recordId, completionHandler: { (record, error) in
                 if let error = error {
@@ -344,11 +352,14 @@ class CloudKitModel {
                             print("Incorrect share record with id \(recordId):", error)
                             return
                         }
-                        let sharingController = UICloudSharingController(share: share, container: self.container)
-                        sharingController.delegate = viewController
-                        sharingController.availablePermissions = [.allowPublic, .allowPrivate, .allowReadOnly, .allowReadWrite]
-                        viewController.present(sharingController, animated: true, completion: {
-                        })
+                        
+                        DispatchQueue.main.async {
+                            let sharingController = UICloudSharingController(share: share, container: self.container)
+                            sharingController.delegate = viewController
+                            sharingController.availablePermissions = [.allowPublic, .allowPrivate, .allowReadOnly, .allowReadWrite]
+                            viewController.present(sharingController, animated: true, completion: {
+                            })
+                        }
                     })
                 } else {
                     // Create new share
