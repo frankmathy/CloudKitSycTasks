@@ -51,10 +51,12 @@ class TaskModel {
     
     func save(task : Task) {
         task.cloudKitDirtyFlag = true
-        saveChanges()
         
         // Propagate to CloudKit
         cloudKitModel.save(task: task)
+
+        // Save - now with CloudKit IDs
+        saveChanges()
     }
     
     func saveChanges() {
@@ -89,20 +91,20 @@ class TaskModel {
         // Add deletion for CloudKit sync
         guard let context = getContext() else { return }
         let task = tasks[index]
-        if task.cloudKitOwnerName != nil && task.cloudKitZoneName != nil && task.cloudKitRecordName != nil {
+        
+        // Delete in CloudKit
+        if !cloudKitModel.delete(task: task)  {
             let deleteTask = CloudKitDeleteTask(context: context)
             deleteTask.cloudKitOwnerName = task.cloudKitOwnerName!
             deleteTask.cloudKitRecordName = task.cloudKitRecordName!
             deleteTask.cloudKitZoneName = task.cloudKitZoneName!
             deleteTask.cloudKitSharedDB = task.cloudKitSharedDB
+            saveChanges()
         }
 
         // Delete task
         context.delete(task)
         saveChanges()
-
-        // Propagate to CloudKit
-        cloudKitModel.delete(task: task)
     }
     
     func findDirtyTasks() -> [Task]? {

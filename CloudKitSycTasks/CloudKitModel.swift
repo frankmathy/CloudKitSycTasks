@@ -163,12 +163,13 @@ class CloudKitModel {
                     }
                 }
             })
-            record = CKRecord(recordType: recordNameTask, recordID: recordId)
         } else {
             record = CKRecord(recordType: recordNameTask, zoneID: zoneID)
             task.cloudKitRecordName = record.recordID.recordName
             task.cloudKitZoneName = record.recordID.zoneID.zoneName
             task.cloudKitOwnerName = record.recordID.zoneID.ownerName
+            TaskModel.sharedInstance.saveChanges()
+            print("Creating new record with owner=\(task.cloudKitOwnerName) zone=\(task.cloudKitZoneName) id=\(task.cloudKitRecordName)")
             record[columnTaskName] = task.taskName as CKRecordValue?
             record[columnDone] = task.done as CKRecordValue
             db.save(record) { (record, error) in
@@ -176,7 +177,6 @@ class CloudKitModel {
                     print("Error saving task to CloudKit:)\(error!)")
                     return
                 }
-                TaskModel.sharedInstance.saveChanges()
             }
         }
     }
@@ -193,12 +193,15 @@ class CloudKitModel {
         }
     }
     
-    func delete(task : Task) {
+    func delete(task : Task) -> Bool {
+        print("Deleting record with owner=\(task.cloudKitOwnerName) zone=\(task.cloudKitZoneName) id=\(task.cloudKitRecordName)")
         if task.cloudKitRecordName != nil && task.cloudKitOwnerName != nil && task.cloudKitZoneName != nil {
             if reachability.connection != .none {
                 deleteTask(inSharedDB: task.cloudKitSharedDB, recordName: task.cloudKitRecordName!, zoneName: task.cloudKitZoneName!, ownerName: task.cloudKitOwnerName!)
+                return true
             }
         }
+        return false
     }
     
     func createDatabaseSubscriptionOperation(subscriptionId: String) -> CKModifySubscriptionsOperation {

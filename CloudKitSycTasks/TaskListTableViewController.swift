@@ -67,7 +67,9 @@ class TaskListTableViewController: UITableViewController, UICloudSharingControll
         case "Add":
             guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
             let context = appDelegate.persistentContainer.viewContext
-            editTaskController.task = Task(context: context)
+            let newTask = Task(context: context)
+            newTask.cloudKitSharedDB = false
+            editTaskController.task = newTask
         case "Edit":
             guard let selectedCell = sender as? UITableViewCell else {
                 fatalError("Unexpected sender: \(sender!)")
